@@ -113,6 +113,7 @@
 (define (handle-timer-tick-event state ev)
   state)
 
+; websockets handling
 (define (websocket-service event-bus)
 
   (define ws-ch (make-channel))
@@ -123,9 +124,9 @@
        (call-ws-init-session-event conn)]
       ["leave-session"
        (call-ws-leave-session-event conn)]
-      [(regexp #rx"join-session \\d{5}")
-       (call-ws-connect-to-session-event conn 12345)]
-      [else (printf "received unknown msg\n")]))
+      [(regexp #px"join-session ([1-9][0-9]{4})" (list _ num))
+       (call-ws-connect-to-session-event conn (string->number num))]
+      [_ (printf "received unknown msg ~a\n" msg)]))
   
   (define (ws-handler conn state)
     (let loop ()
